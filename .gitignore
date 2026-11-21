@@ -10,8 +10,7 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# 体积较大且可再生的文件（CI 用 npm install，不依赖 lock）
-package-lock.json
+# 注意：package-lock.json 必须入库 —— CI 的 setup-node cache:npm 依赖它
 # 本地截图，不入库
 /docs/shots/
 
