@@ -2,6 +2,8 @@
 
 一个自建的 IP 测速小工具：打开就能看到出口 IP、归属地与运营商，点一下就能真实测量下载 / 上传 / 延迟 / 抖动。中英双语、明暗双主题、无账号、无追踪。
 
+**在线地址：<https://ip.266633.xyz>**（Cloudflare Pages，全球边缘节点）
+
 ## 启动
 
 ```bash
@@ -78,11 +80,18 @@ src/
 
 ```bash
 npx wrangler login
-npm run build:static
-npx wrangler pages deploy out --project-name=ip-lens
+npx wrangler pages project create ip-lens --production-branch=main   # 仅首次
+npm run build:static                                                # 产出 out/
+npx wrangler pages deploy out --project-name=ip-lens --branch=main
 ```
 
 `wrangler.toml` 已声明 `pages_build_output_dir = "out"`，也可直接 `npx wrangler pages deploy`。
+
+> wrangler 4.x 起 `pages deploy` 不会自动建项目，漏了 `pages project create` 会报
+> `The Pages project "ip-lens" does not exist`。
+>
+> 绑定自定义域名后还需要手动加一条 DNS 记录（Cloudflare 只登记域名，不建记录）：
+> `CNAME` / `ip` → `ip-lens.pages.dev` / **Proxied**。否则域名会一直停在 `pending`。
 
 ## 说明
 

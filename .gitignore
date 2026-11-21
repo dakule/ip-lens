@@ -14,3 +14,6 @@ next-env.d.ts
 package-lock.json
 # 本地截图，不入库
 /docs/shots/
+
+# 部署交接单（含账号与域名信息，仅本地）
+DEPLOY.md
