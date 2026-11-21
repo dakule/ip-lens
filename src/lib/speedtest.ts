@@ -6,11 +6,17 @@ export type NetInfo = {
   ip: string;
   city: string;
   country: string;
+  /** ISO 国家代码，如 CN / US，用于判断该不该显示中文 */
+  countryCode: string;
   region: string;
   isp: string;
   asn: number | null;
   colo: string;
   timezone: string;
+  /** 仅当 IP 归属中国时填充：ipwho.is 的 lang=zh-CN 返回的中文地名 */
+  cityZh?: string;
+  countryZh?: string;
+  regionZh?: string;
 };
 
 export type Sample = { mbps: number; at: number };
@@ -38,33 +44,54 @@ export async function fetchNetInfo(signal?: AbortSignal): Promise<NetInfo> {
   const who = whoRes.status === "fulfilled" ? (whoRes.value as Record<string, unknown>) : null;
   const meta = metaRes.status === "fulfilled" ? (metaRes.value as Record<string, unknown>) : null;
 
+  let info: NetInfo;
+
   if (!who || who.success === false || !asText(who.ip)) {
     if (!meta || !asText(meta.clientIp ?? meta.ip)) throw new Error("no network info");
-    return {
+    info = {
       ip: asText(meta.clientIp ?? meta.ip),
       city: asText(meta.city),
       country: asText(meta.country),
+      countryCode: asText(meta.country),
       region: asText(meta.region),
       isp: asText(meta.asOrganization),
       asn: typeof meta.asn === "number" ? meta.asn : null,
       colo: asText(meta.colo),
       timezone: asText(meta.timezone),
     };
+  } else {
+    const conn = (who.connection ?? {}) as Record<string, unknown>;
+    const tz = (who.timezone ?? {}) as Record<string, unknown>;
+
+    info = {
+      ip: asText(who.ip),
+      city: asText(who.city),
+      country: asText(who.country),
+      countryCode: asText(who.country_code),
+      region: asText(who.region),
+      isp: asText(conn.isp) || asText(conn.org),
+      asn: conn.asn ? Number(conn.asn) || null : null,
+      colo: meta ? asText(meta.colo) : "",
+      timezone: asText(tz.id),
+    };
   }
 
-  const conn = (who.connection ?? {}) as Record<string, unknown>;
-  const tz = (who.timezone ?? {}) as Record<string, unknown>;
+  // 中国 IP：再取一次中文地名（运营商等仍由前端本地翻译），失败则保持英文
+  if (info.countryCode.toUpperCase() === "CN") {
+    try {
+      const zhRes = await fetch("https://ipwho.is/?lang=zh-CN", { cache: "no-store", signal });
+      const zh = (await zhRes.json()) as Record<string, unknown>;
+      if (zh && zh.success !== false) {
+        info.cityZh = asText(zh.city) || undefined;
+        info.countryZh = asText(zh.country) || undefined;
+        info.regionZh = asText(zh.region) || undefined;
+      }
+    } catch {
+      /* 拿不到中文名不影响主流程 */
+    }
+  }
 
-  return {
-    ip: asText(who.ip),
-    city: asText(who.city),
-    country: asText(who.country),
-    region: asText(who.region),
-    isp: asText(conn.isp) || asText(conn.org),
-    asn: conn.asn ? Number(conn.asn) || null : null,
-    colo: meta ? asText(meta.colo) : "",
-    timezone: asText(tz.id),
-  };
+  return info;
 }
 
 /** 延迟：向 0 字节资源发若干次请求，取中位数；抖动 = 相邻差值均值 */

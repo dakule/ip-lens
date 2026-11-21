@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "IP Lens — 看清你的网络 / See your network clearly",
   description:
-    "查看出口 IP、归属地与运营商，并真实测量下载、上传、延迟与抖动。无账号、无追踪，全部在浏览器内完成。",
+    "查看您的 IP、归属地与运营商，并真实测量下载、上传、延迟与抖动。无账号、无追踪，全部在浏览器内完成。",
 };
 
 export default function RootLayout({

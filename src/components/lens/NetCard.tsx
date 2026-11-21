@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { NetInfo } from "@/lib/speedtest";
+import { presentNet } from "@/lib/localize";
 import type { Copy } from "./i18n";
 import { Icon } from "./icons";
 
@@ -31,13 +32,15 @@ export function NetCard({
     }
   };
 
-  const rows: { icon: string; label: string; value: string; note?: string }[] = info
+  const n = info ? presentNet(info) : null;
+
+  const rows: { icon: string; label: string; value: string; note?: string }[] = n
     ? [
-        { icon: "globe", label: t.location, value: [info.city, info.country].filter(Boolean).join(" · ") },
-        { icon: "wifi", label: t.isp, value: info.isp },
-        { icon: "pulse", label: t.asn, value: info.asn ? `AS${info.asn}` : "—" },
-        { icon: "lens", label: t.edge, value: info.colo },
-        { icon: "clock", label: t.timezone, value: info.timezone },
+        { icon: "globe", label: t.location, value: n.location },
+        { icon: "wifi", label: t.isp, value: n.isp },
+        { icon: "pulse", label: t.asn, value: n.asn },
+        { icon: "lens", label: t.edge, value: n.colo },
+        { icon: "clock", label: t.timezone, value: n.timezone },
       ]
     : [];
 

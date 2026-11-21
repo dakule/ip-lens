@@ -15,6 +15,7 @@ import {
   type NetInfo,
   type Sample,
 } from "@/lib/speedtest";
+import { presentNet } from "@/lib/localize";
 
 const DOWN_BYTES = 10_000_000;
 const UP_BYTES = 4_000_000;
@@ -232,7 +233,7 @@ export function LensApp() {
           <div className="chip">
             <span className="inline-flex size-1.5 rounded-full bg-good" />
             <span className="max-w-[70vw] truncate">
-              {info ? `${info.city} · ${info.isp}` : netError ? t.netError : t.loadingNet}
+              {info ? presentNet(info).short : netError ? t.netError : t.loadingNet}
             </span>
           </div>
           <h1 className="mt-4 text-[30px] font-semibold leading-[1.15] tracking-tight sm:text-[42px]">
