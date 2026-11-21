@@ -1,0 +1,16 @@
+/node_modules
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+.env*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+
+# 体积较大且可再生的文件（CI 用 npm install，不依赖 lock）
+package-lock.json
+# 本地截图，不入库
+/docs/shots/

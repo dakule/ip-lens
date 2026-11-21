@@ -1,0 +1,5 @@
+# Cloudflare Pages 配置（wrangler v3.28+ 支持 pages_build_output_dir）
+# 部署：npm run build:static && npx wrangler pages deploy out
+name = "ip-lens"
+pages_build_output_dir = "out"
+compatibility_date = "2026-11-21"
